@@ -1074,6 +1074,11 @@ img {
   .project-card.featured {
     grid-column: span 1;
   }
+  /* grid 直接子元素是 BorderGlow 包装层：重置大卡跨列，
+     否则单列 1fr 下 span 2 会隐式创建第二列，把半数卡片挤出视口 */
+  .glow-project-card--lg {
+    grid-column: auto;
+  }
   .strengths-grid {
     grid-template-columns: repeat(2, 1fr);
   }
