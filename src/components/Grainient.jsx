@@ -146,18 +146,12 @@ const Grainient = ({
     const container = containerRef.current
     if (!container) return
 
-    // 移动端降配：像素密度压到 1（高密度屏像素填充开销最大），并隔帧渲染降帧率；
-    // 尊重系统「减弱动态效果」，此时只渲染一帧静帧
-    const isMobile = window.matchMedia('(max-width: 720px)').matches
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
     const renderer = new Renderer({
       webgl: 2,
       alpha: true,
       antialias: false,
-      // 背景为氛围层且被 ::after 压暗，1.5 倍像素密度足够，明显降低像素填充开销；
-      // 手机 GPU 更弱，上限压到 1 即可保留观感又显著省电
-      dpr: Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5),
+      // 背景为氛围层且被 ::after 压暗，1.5 倍像素密度足够，明显降低像素填充开销
+      dpr: Math.min(window.devicePixelRatio || 1, 1.5),
     })
 
     const gl = renderer.gl
@@ -218,28 +212,18 @@ const Grainient = ({
     setSize()
 
     let raf = 0
-    let frame = 0
     let isVisible = true
     let isPageVisible = !document.hidden
     const t0 = performance.now()
 
-    // 移动端隔帧渲染（奇数帧跳过），动画时间仍按真实时间推进，视觉约 30fps 足够平滑
     const loop = (t) => {
       program.uniforms.iTime.value = (t - t0) * 0.001
-      if (!isMobile || (++frame & 1) === 0) renderer.render({ scene: mesh })
+      renderer.render({ scene: mesh })
       raf = requestAnimationFrame(loop)
     }
 
     const tryStart = () => {
-      if (isVisible && isPageVisible && raf === 0) {
-        if (reduceMotion) {
-          // 减弱动态效果：渲染一帧静止氛围背景后不再循环
-          program.uniforms.iTime.value = 0
-          renderer.render({ scene: mesh })
-          return
-        }
-        raf = requestAnimationFrame(loop)
-      }
+      if (isVisible && isPageVisible && raf === 0) raf = requestAnimationFrame(loop)
     }
     const tryStop = () => {
       if (raf !== 0) {

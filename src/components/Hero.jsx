@@ -41,8 +41,6 @@ export default function Hero({ soundOn }) {
   const heroRef = useRef(null)
   const videoRef = useRef(null)
   const [away, setAway] = useState(false)
-  const awayRef = useRef(false)
-  const startedRef = useRef(false)
 
   // 滚动离开 Hero 达 2/3 时标记 away（用于停止播放）。
   // scroll 高频触发 → rAF 节流，避免每次滚动都强制同步 layout
@@ -55,8 +53,7 @@ export default function Hero({ soundOn }) {
       const r = el.getBoundingClientRect()
       const passed = -r.top
       const ratio = r.height > 0 ? passed / r.height : 1
-      awayRef.current = ratio >= 2 / 3
-      setAway(awayRef.current)
+      setAway(ratio >= 2 / 3)
     }
     const onScroll = () => {
       if (!rafId) rafId = requestAnimationFrame(update)
@@ -71,33 +68,10 @@ export default function Hero({ soundOn }) {
     }
   }, [])
 
-  // 视频延迟加载：等开场动画结束（fx-intro-done）才赋 src 开始拉流，
-  // 让首屏先下完 JS/CSS/字体/poster；4s 兜底防止动画异常时永不播放。
-  useEffect(() => {
-    const start = () => {
-      if (startedRef.current) return
-      startedRef.current = true
-      const v = videoRef.current
-      if (!v || v.getAttribute('src')) return
-      v.src = '/assets/showreel.mp4'
-      v.load()
-      if (!awayRef.current) {
-        const p = v.play()
-        if (p) p.catch(() => {})
-      }
-    }
-    window.addEventListener('fx-intro-done', start, { once: true })
-    const timer = window.setTimeout(start, 4000)
-    return () => {
-      window.removeEventListener('fx-intro-done', start)
-      window.clearTimeout(timer)
-    }
-  }, [])
-
-  // 根据 声音开关 + 是否离开 2/3 控制播放/暂停/静音（仅视频已启动后）
+  // 根据 声音开关 + 是否离开 2/3 控制播放/暂停/静音
   useEffect(() => {
     const v = videoRef.current
-    if (!v || !startedRef.current) return
+    if (!v) return
     if (away) {
       v.pause()
       return
@@ -113,11 +87,12 @@ export default function Hero({ soundOn }) {
         <video
           className="hero-video"
           ref={videoRef}
-          poster="/assets/hero-poster.jpg"
+          src="/assets/showreel.mp4"
+          autoPlay
           muted
           loop
           playsInline
-          preload="none"
+          preload="metadata"
         />
         <div className="hero-scrim" />
         <div className="hero-top-bar">

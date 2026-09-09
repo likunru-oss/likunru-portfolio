@@ -31,7 +31,7 @@ export default function Navbar({ soundOn, onToggleSound }) {
       <div className="navbar-inner">
         <a href="#" className="logo">CV—'26</a>
         <div className="nav-center label">Curriculum Vitae of an AI Director</div>
-        <div className="nav-right">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <ul className="nav-links">
             {links.map((l) => (
               <li key={l.href}>
