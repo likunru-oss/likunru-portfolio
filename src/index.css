@@ -1075,8 +1075,10 @@ img {
     grid-column: span 1;
   }
   /* grid 直接子元素是 BorderGlow 包装层：重置大卡跨列，
-     否则单列 1fr 下 span 2 会隐式创建第二列，把半数卡片挤出视口 */
-  .glow-project-card--lg {
+     否则单列 1fr 下 span 2 会隐式创建第二列，把半数卡片挤出视口。
+     注意加 .projects-grid 提高优先级——基础 span 2 规则写在文件更后方，
+     同优先级会覆盖此处的 auto */
+  .projects-grid .glow-project-card--lg {
     grid-column: auto;
   }
   .strengths-grid {
