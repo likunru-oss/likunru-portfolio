@@ -11,7 +11,7 @@
   --max-width: 1700px;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-mono: "Space Mono", "SF Mono", "Fira Code", monospace;
-  --font-serif: "Times New Roman", Times, "Songti SC", serif;
+  --font-serif: "Noto Serif SC", "Songti SC", "SimSun", "Times New Roman", serif;
 }
 
 * {

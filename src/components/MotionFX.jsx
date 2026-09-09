@@ -120,6 +120,8 @@ export default function MotionFX() {
       intro.eventCallback('onComplete', () => {
         const el = document.querySelector('.fx-overlay')
         if (el) el.remove()
+        // 通知 Hero：开场动画结束，此刻才应加载/播放首屏视频
+        window.dispatchEvent(new CustomEvent('fx-intro-done'))
       })
 
       /* ---------- 2. 滚动场景 ---------- */
