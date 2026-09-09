@@ -37,7 +37,7 @@ const featured = [
     role: 'AI 导演',
     desc: '把 15 分钟 SPA 装进口袋，通勤、午休、等位的城市微疗愈场景，由 AI 影像一气呵成。',
     image: '/assets/project-afu.jpg',
-    videoUrl: 'https://www.xiaohongshu.com/discovery/item/6a82e1cd000000002c00617d?source=webshare&xhsshare=pc_web&xsec_token=ABZUFX9vCA7cC9BE1LnxChtEObWYwvKETcut_y0zCB0Io=&xsec_source=pc_share',
+    videoUrl: 'https://xhslink.cn/o/6z6LCa0slTz',
   },
   {
     id: 'huawei',
