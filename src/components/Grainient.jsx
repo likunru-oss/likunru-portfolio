@@ -146,12 +146,15 @@ const Grainient = ({
     const container = containerRef.current
     if (!container) return
 
+    // 手机降配：窄屏 dpr 上限 1（减像素填充），桌面保持 1.5
+    const isMobileViewport = window.matchMedia('(max-width: 900px)').matches
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
     const renderer = new Renderer({
       webgl: 2,
       alpha: true,
       antialias: false,
-      // 背景为氛围层且被 ::after 压暗，1.5 倍像素密度足够，明显降低像素填充开销
-      dpr: Math.min(window.devicePixelRatio || 1, 1.5),
+      dpr: Math.min(window.devicePixelRatio || 1, isMobileViewport ? 1 : 1.5),
     })
 
     const gl = renderer.gl
@@ -215,14 +218,31 @@ const Grainient = ({
     let isVisible = true
     let isPageVisible = !document.hidden
     const t0 = performance.now()
+    // 手机隔帧渲染（约 30fps），氛围背景肉眼无差、GPU 减半
+    const frameSkip = isMobileViewport ? 2 : 1
+    let frameCount = 0
 
-    const loop = (t) => {
+    const render = (t) => {
       program.uniforms.iTime.value = (t - t0) * 0.001
       renderer.render({ scene: mesh })
+    }
+
+    const loop = (t) => {
+      frameCount++
+      if (frameCount % frameSkip !== 0) {
+        raf = requestAnimationFrame(loop)
+        return
+      }
+      render(t)
       raf = requestAnimationFrame(loop)
     }
 
     const tryStart = () => {
+      if (prefersReduced) {
+        // 减弱动态：只渲染一帧静帧，不再跑循环
+        render(performance.now())
+        return
+      }
       if (isVisible && isPageVisible && raf === 0) raf = requestAnimationFrame(loop)
     }
     const tryStop = () => {

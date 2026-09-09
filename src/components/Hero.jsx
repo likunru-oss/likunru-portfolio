@@ -41,6 +41,29 @@ export default function Hero({ soundOn }) {
   const heroRef = useRef(null)
   const videoRef = useRef(null)
   const [away, setAway] = useState(false)
+  // 视频是否已开始加载（intro 结束后才拉流，避免 4MB 视频抢首屏带宽）
+  const didStartRef = useRef(false)
+
+  const startVideo = () => {
+    if (didStartRef.current) return
+    didStartRef.current = true
+    const v = videoRef.current
+    if (!v) return
+    v.src = '/assets/showreel.mp4'
+    v.load()
+    const p = v.play()
+    if (p) p.catch(() => {})
+  }
+
+  // 开场动画结束后才加载视频；4s 兜底（如 reduced-motion 下 MotionFX 不跑）
+  useEffect(() => {
+    window.addEventListener('fx-intro-done', startVideo)
+    const t = window.setTimeout(startVideo, 4000)
+    return () => {
+      window.removeEventListener('fx-intro-done', startVideo)
+      window.clearTimeout(t)
+    }
+  }, [])
 
   // 滚动离开 Hero 达 2/3 时标记 away（用于停止播放）。
   // scroll 高频触发 → rAF 节流，避免每次滚动都强制同步 layout
@@ -68,10 +91,10 @@ export default function Hero({ soundOn }) {
     }
   }, [])
 
-  // 根据 声音开关 + 是否离开 2/3 控制播放/暂停/静音
+  // 根据 声音开关 + 是否离开 2/3 控制播放/暂停/静音（视频未开始加载时跳过）
   useEffect(() => {
     const v = videoRef.current
-    if (!v) return
+    if (!v || !didStartRef.current || !v.src) return
     if (away) {
       v.pause()
       return
@@ -87,12 +110,11 @@ export default function Hero({ soundOn }) {
         <video
           className="hero-video"
           ref={videoRef}
-          src="/assets/showreel.mp4"
-          autoPlay
-          muted
+          poster="/assets/hero-poster.jpg"
           loop
+          muted
           playsInline
-          preload="metadata"
+          preload="none"
         />
         <div className="hero-scrim" />
         <div className="hero-top-bar">
