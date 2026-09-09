@@ -1123,22 +1123,36 @@ img {
     text-align: left;
     white-space: normal;
   }
-  /* 项目卡浮层标题被图片底部大号海报字压住：加深遮罩 + 调大字号 + 文字阴影 */
+  /* 海报图（kfc/华为/小野）中部本身带海报大字（"肯德基车速取" "ORIENTAL
+     SANCTUARY" "小野 Hirono"等），与浮层 brand/title 重叠难辨。
+     全卡叠一道从顶部就开始压暗的蒙版，把图片大字压到不抢戏，浮层文字上浮。 */
+  .project-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 35%, rgba(0, 0, 0, 0.75) 68%, rgba(0, 0, 0, 0.96) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
   .project-info {
+    z-index: 2;
     padding: 24px;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.78) 45%, rgba(0, 0, 0, 0.95) 100%);
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0.8) 100%);
+  }
+  .project-card::after {
+    z-index: 3;
   }
   .project-brand {
     margin-bottom: 6px;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
   }
   .project-title {
     font-size: clamp(1.4rem, 5.5vw, 1.9rem);
-    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
   }
   .project-role,
   .project-desc {
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
   }
   .project-desc {
     font-size: 0.85rem;
