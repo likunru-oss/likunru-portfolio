@@ -37,12 +37,17 @@ function Barcode() {
   )
 }
 
-export default function Hero({ soundOn }) {
+export default function Hero({ soundOn, onSoundBlocked }) {
   const heroRef = useRef(null)
   const videoRef = useRef(null)
   const [away, setAway] = useState(false)
   // 视频是否已开始加载（intro 结束后才拉流，避免 4MB 视频抢首屏带宽）
   const didStartRef = useRef(false)
+  // startVideo 由一次性事件/定时器触发，用 ref 读取最新开关状态
+  const soundRef = useRef(soundOn)
+  soundRef.current = soundOn
+  const blockedRef = useRef(onSoundBlocked)
+  blockedRef.current = onSoundBlocked
 
   const startVideo = () => {
     if (didStartRef.current) return
@@ -51,8 +56,17 @@ export default function Hero({ soundOn }) {
     if (!v) return
     v.src = '/assets/showreel.mp4'
     v.load()
+    v.muted = !soundRef.current
     const p = v.play()
-    if (p) p.catch(() => {})
+    if (p)
+      p.catch(() => {
+        // 浏览器拦截有声自动播放 → 静音重试，并同步回 UI 状态
+        if (!v.muted) {
+          v.muted = true
+          v.play().catch(() => {})
+          blockedRef.current?.()
+        }
+      })
   }
 
   // 开场动画结束后才加载视频；4s 兜底（如 reduced-motion 下 MotionFX 不跑）

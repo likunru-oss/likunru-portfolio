@@ -12,7 +12,8 @@ import MotionFX from './components/MotionFX'
 const Grainient = lazy(() => import('./components/Grainient'))
 
 function App() {
-  const [soundOn, setSoundOn] = useState(false)
+  // 默认开声：若浏览器拦截有声自动播放，Hero 会回退静音并回调改回 false
+  const [soundOn, setSoundOn] = useState(true)
 
   return (
     <>
@@ -45,7 +46,7 @@ function App() {
       </div>
       <Navbar soundOn={soundOn} onToggleSound={() => setSoundOn((v) => !v)} />
       <main>
-        <Hero soundOn={soundOn} />
+        <Hero soundOn={soundOn} onSoundBlocked={() => setSoundOn(false)} />
         <About />
         <Projects />
         <Strengths />
