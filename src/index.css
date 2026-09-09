@@ -1091,6 +1091,13 @@ img {
   .nav-center {
     display: none;
   }
+  /* hero 取消 2.35:1 固定画幅，否则窄屏下会被 overflow:hidden 裁掉首屏内容 */
+  .hero-stage {
+    aspect-ratio: auto;
+  }
+  .hero-top-bar {
+    padding-top: clamp(28px, 7vw, 48px);
+  }
   .hero-tagline {
     align-self: flex-start;
   }
